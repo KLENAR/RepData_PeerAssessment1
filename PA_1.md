@@ -1,8 +1,3 @@
----
-output:
-  html_document:
-    keep_md: yes
----
 #Reproducible Research: Peer Assessment 1
 
 ##Loading and preprocessing the data
@@ -13,15 +8,15 @@ Show any code that is needed to
 
 2. Process/transform the data (if necessary) into a format suitable for your analysis
 
-```{r global}
+
+```r
 library(ggplot2)
 library(lubridate)
 #need to use wday() instead of weekdays()
-
 ```
 
-```{r download}
 
+```r
 # set the file url 
   fileurl <- c("http://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip")
 
@@ -31,7 +26,7 @@ library(lubridate)
 # create the placeholder file
   tfile <- tempfile(tmpdir=tdir, fileext=".zip")
 
-# download into the placeholder file tfile (works for WIN 8 64õ)
+# download into the placeholder file tfile (works for WIN 8 64Ñ…)
   download.file(fileurl, tfile, method="auto", mode="wb")
 
 # get the name of the first file in the zip archive
@@ -45,7 +40,6 @@ library(lubridate)
 
 # load the csv in data frame
   MyData <- read.csv(fpath, as.is=TRUE)
-
 ```
 
 ##What is mean total number of steps taken per day?
@@ -57,7 +51,8 @@ For this part of the assignment, you can ignore the missing values in the datase
 2. Calculate and report the mean and median total number of steps taken per day.
 
 
-```{r SumDay}
+
+```r
 # generate MyData_Omit with complete cases only
   MyData_Omit <- na.omit(MyData)
 
@@ -69,25 +64,40 @@ For this part of the assignment, you can ignore the missing values in the datase
        colour = "black") + scale_x_continuous("Total number of steps taken per day", breaks = seq (min (Day_steps_sum$steps),  max(Day_steps_sum$steps), nbinwidth)) + 
        scale_y_continuous("Frequency") + ggtitle("Total Number of Steps Taken Each Day")
   p
+```
 
+![](PA_1_files/figure-html/SumDay-1.png) 
+
+```r
 # get mean and median total number of steps per day
   me_dss<-mean(Day_steps_sum$steps)
   me_dss
+```
+
+```
+## [1] 10766.19
+```
+
+```r
   md_dss<-median(Day_steps_sum$steps)
   md_dss
 ```
 
-*The mean and median total number of steps per day are `r me_dss` and `r md_dss` steps respectively.*
+```
+## [1] 10765
+```
+
+*The mean and median total number of steps per day are 1.0766189\times 10^{4} and 10765 steps respectively.*
 
 ##What is the average daily activity pattern?
 
-1. Make a time series plot (i.e. type = “l”) of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis).
+1. Make a time series plot (i.e. type = â€œlâ€) of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis).
 
 2. Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
 
 
-```{r MeanInterval}
 
+```r
 # aggregate steps as interval to get average number of steps in an interval across all days
   Int_steps_mean <- aggregate(steps ~ interval, MyData_Omit, mean)
 
@@ -101,16 +111,25 @@ For this part of the assignment, you can ignore the missing values in the datase
          scale_y_continuous("Average Number of Steps") +
          ggtitle("Average Number of Steps Taken by   Interval")
   p2
+```
+
+![](PA_1_files/figure-html/MeanInterval-1.png) 
+
+```r
 # find row with max of average number of steps in interval
   max_ave_steps_row_id <- which.max(Int_steps_mean$steps)
 
 # get the interval with maximum average number of steps in an interval
   max_av_step<- Int_steps_mean [max_ave_steps_row_id, ]
   max_av_step
-
 ```
 
-*Thus `r max_av_step$interval`-th 5-minute interval, on average across all the days in the dataset, contains `r max_av_step$steps`  steps which is the maximum number of steps in av.*
+```
+##     interval    steps
+## 104      835 206.1698
+```
+
+*Thus 835-th 5-minute interval, on average across all the days in the dataset, contains 206.1698113  steps which is the maximum number of steps in av.*
 
 ##Imputing missing values
 
@@ -125,17 +144,23 @@ Note that there are a number of days/intervals where there are missing values (c
 4. Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day. Do these values differ from the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?
 
 
-```{r NumberRows}
+
+```r
 # number of rows with NA's
   nrow_NA <- nrow(MyData[!complete.cases(MyData),])
   nrow_NA
 ```
 
-*Thus the total number of missing values in the dataset is equal `r nrow_NA` from total number of rows `r nrow(MyData)`*
+```
+## [1] 2304
+```
 
-* For performing imputation, I replace the NA by the mean for that 5-minute interval. There are the nesessary  data just in the data frame “Int_steps_mean”. *
+*Thus the total number of missing values in the dataset is equal 2304 from total number of rows 17568*
 
-```{r imputation}
+* For performing imputation, I replace the NA by the mean for that 5-minute interval. There are the nesessary  data just in the data frame â€œInt_steps_meanâ€. *
+
+
+```r
 # create a new dataset that is equal to the original dataset but with the missing data filled in.
   MyData_Imp<-MyData
 
@@ -157,7 +182,11 @@ Note that there are a number of days/intervals where there are missing values (c
         scale_y_continuous("Frequency") +
         ggtitle("Total Number of Steps Taken Each Day (with imputed values)")
   p3
+```
 
+![](PA_1_files/figure-html/imputation-1.png) 
+
+```r
 # get mean and median of total number of steps per day for filled in missed data 
   me_dss_imp<-mean(Day_steps_sum_imp$steps)
   md_dss_imp<-median(Day_steps_sum_imp$steps)
@@ -165,22 +194,32 @@ Note that there are a number of days/intervals where there are missing values (c
 # get mean and median of total number of steps per day for data with NA's removed
 #from the first part of the assignment
   me_dss
-  md_dss
-
-
 ```
 
-*The mean and median total number of steps per day for fill in missed data  are `r me_dss_imp` and `r md_dss_imp` steps respectively. These values weakly differ from the estimates from the first part of the assignment  `r me_dss` and `r md_dss`. The means are same, there is slight change in median value. *
+```
+## [1] 10766.19
+```
+
+```r
+  md_dss
+```
+
+```
+## [1] 10765
+```
+
+*The mean and median total number of steps per day for fill in missed data  are 1.0766189\times 10^{4} and 1.0765594\times 10^{4} steps respectively. These values weakly differ from the estimates from the first part of the assignment  1.0766189\times 10^{4} and 10765. The means are same, there is slight change in median value. *
 
 ##Are there differences in activity patterns between weekdays and weekends?
 
 For this part the weekdays() function may be of some help here. Use the dataset with the filled-in missing values for this part.
 
-1. Create a new factor variable in the dataset with two levels – “weekday” and “weekend” indicating whether a given date is a weekday or weekend day.
+1. Create a new factor variable in the dataset with two levels â€“ â€œweekdayâ€ and â€œweekendâ€ indicating whether a given date is a weekday or weekend day.
 
-2. Make a panel plot containing a time series plot (i.e. type = “l”) of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis).
+2. Make a panel plot containing a time series plot (i.e. type = â€œlâ€) of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis).
 
-```{r weekend}
+
+```r
 # convert date from string to Date class
   MyData_Imp$date <- as.Date(MyData_Imp$date, "%Y-%m-%d")
 
@@ -202,7 +241,8 @@ For this part the weekdays() function may be of some help here. Use the dataset 
         scale_y_continuous("Average Number of Steps") +
         ggtitle("Average Number of Steps Taken by Interval")
   p4
-
 ```
+
+![](PA_1_files/figure-html/weekend-1.png) 
 
 *There are a lot of differences between weekdays and weekends because of different schedule *
